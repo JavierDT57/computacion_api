@@ -39,7 +39,7 @@ class AdminAll(generics.CreateAPIView):
         
         return Response(lista, 200)
 
-class AdminView(generics.CreateAPIView):
+class AdminView(generics.CreateAPIView):#Vista que realiza el Post
     #Obtener usuario por ID
     # permission_classes = (permissions.IsAuthenticated,)
     def get(self, request, *args, **kwargs):
