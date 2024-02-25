@@ -62,33 +62,34 @@ class AdminView(generics.CreateAPIView):
             password = request.data['password']
             #Valida si existe el usuario o bien el email registrado
             existing_user = User.objects.filter(email=email).first()
-
+            #validacion de usuarios para su registro
             if existing_user:
                 return Response({"message":"Username "+email+", is already taken"},400)
-
+            #asignacion de valores a cada campo
             user = User.objects.create( username = email,
                                         email = email,
                                         first_name = first_name,
                                         last_name = last_name,
                                         is_active = 1)
 
-
+            #Guardar los datos del administrador
             user.save()
-            user.set_password(password)
-            user.save()
+            user.set_password(password) #Encripta-cifra la contraseña
+            user.save()#Guarda la contraseña cifrada
 
             group, created = Group.objects.get_or_create(name=role)
             group.user_set.add(user)
             user.save()
 
             #Create a profile for the user
-            admin = Administradores.objects.create(user=user,
+            #Anadir la informacion del administrador creado a el modelo de administradores
+            admin = Administradores.objects.create(user=user,#Aca se liga la FK entre los 2 modelos
                                             clave_admin= request.data["clave_admin"],
                                             telefono= request.data["telefono"],
                                             rfc= request.data["rfc"].upper(),
                                             edad= request.data["edad"],
                                             ocupacion= request.data["ocupacion"])
-            admin.save()
+            admin.save()#Guarda la informacion del administrador
 
             return Response({"admin_created_id": admin.id }, 201)
 
