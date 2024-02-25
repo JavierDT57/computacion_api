@@ -91,6 +91,6 @@ class AdminView(generics.CreateAPIView):
                                             ocupacion= request.data["ocupacion"])
             admin.save()#Guarda la informacion del administrador
 
-            return Response({"admin_created_id": admin.id }, 201)
+            return Response({"admin_created_id": admin.id }, 201)#Si todo sale bien manda un mensaje de 201 (todo correcto)
 
-        return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)#Si hay un error manda un mensaje de 400 (error)
