@@ -4,7 +4,6 @@ from django.dispatch import receiver
 from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth.models import AbstractUser, User
 from django.conf import settings
-from django.contrib.postgres.fields import JSONField
 
 class BearerTokenAuthentication(TokenAuthentication):
     keyword = u"Bearer"
