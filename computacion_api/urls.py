@@ -17,6 +17,8 @@ from django.contrib import admin
 from django.urls import path
 from computacion_api.views import bootstrap
 from computacion_api.views import users#Vista de administradores
+from computacion_api.views import alumnos#Visa de alumnos
+from computacion_api.views import maestros#Vista de maestros
 from computacion_api.views import auth
 
 urlpatterns = [
