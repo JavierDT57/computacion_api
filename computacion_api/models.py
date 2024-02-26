@@ -4,6 +4,7 @@ from django.dispatch import receiver
 from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth.models import AbstractUser, User
 from django.conf import settings
+from django.contrib.postgres.fields import JSONField
 
 class BearerTokenAuthentication(TokenAuthentication):
     keyword = u"Bearer"
@@ -41,3 +42,18 @@ class Alumnos(models.Model):
         return "Perfil del alumno "+self.first_name+" "+self.last_name    
 
 
+class Maestros(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False, default=None)
+    id_trabajador = models.CharField(max_length=255,null=True, blank=True)#matricula del alumno
+    fecha_nacimiento = models.DateTimeField(auto_now_add=False,null=True, blank=True)#fecha de nacimiento
+    telefono = models.CharField(max_length=255, null=True, blank=True)#telefono
+    rfc = models.CharField(max_length=255,null=True, blank=True)#RFC
+    cubiculo = models.CharField(max_length=255,null=True, blank=True)#cubiculo
+    area_investigacion = models.CharField(max_length=255,null=True, blank=True)#area de investigacion
+    materias_json = models.TextField(null=True, blank=True)#materias para seleccionar y estan en un arreglo json, por asi el inicio de la variable
+    creation = models.DateTimeField(auto_now_add=True, null=True, blank=True)#fecha de creacion del registro
+    update = models.DateTimeField(null=True, blank=True)#fecha de actualizacion del registro
+
+    def __str__(self):
+        return "Perfil del maestro "+self.first_name+" "+self.last_name  
