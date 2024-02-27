@@ -88,6 +88,7 @@ class AlumnosView(generics.CreateAPIView):#Vista que realiza el Post
                                             curp= request.data["curp"].upper(),
                                             rfc= request.data["rfc"].upper(),
                                             edad= request.data["edad"],
+                                            telefono= request.data["telefono"],
                                             ocupacion= request.data["ocupacion"])
             alumno.save()#Guarda la informacion del alumno
 
