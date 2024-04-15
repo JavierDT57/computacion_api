@@ -104,7 +104,7 @@ class AlumnosViewEdit(generics.CreateAPIView):
         # iduser=request.data["id"]
         alumno = get_object_or_404(Alumnos, id=request.data["id"])
         alumno.matricula = request.data["matricula"]
-        alumno.fecha_de_nacimiento = request.data["fecha_de_nacimiento"]
+        alumno.fecha_nacimiento = request.data["fecha_nacimiento"]
         alumno.curp = request.data["curp"]
         alumno.rfc = request.data["rfc"]
         alumno.edad = request.data["edad"]
