@@ -30,8 +30,9 @@ import string
 import random
 import json
 
-#Esta funcion permite obtener toda la vista de administradores, mediante el token de autenticacion de inicio de sesion
+#Permite obtener toda la lista de administradores
 class AdminAll(generics.CreateAPIView):
+    #Esta linea se usa para pedir el token de autenticación de inicio de sesión
     permission_classes = (permissions.IsAuthenticated,)
     def get(self, request, *args, **kwargs):
         admin = Administradores.objects.filter(user__is_active = 1).order_by("id")
@@ -39,7 +40,8 @@ class AdminAll(generics.CreateAPIView):
         
         return Response(lista, 200)
 
-class AdminView(generics.CreateAPIView):#Vista que realiza el Post
+#Esta clase permite 
+class AdminView(generics.CreateAPIView):
     #Obtener usuario por ID
     # permission_classes = (permissions.IsAuthenticated,)
     def get(self, request, *args, **kwargs):
@@ -51,7 +53,6 @@ class AdminView(generics.CreateAPIView):#Vista que realiza el Post
     #Registrar nuevo usuario
     @transaction.atomic
     def post(self, request, *args, **kwargs):
-
         user = UserSerializer(data=request.data)
         if user.is_valid():
             #Grab user data
@@ -62,35 +63,89 @@ class AdminView(generics.CreateAPIView):#Vista que realiza el Post
             password = request.data['password']
             #Valida si existe el usuario o bien el email registrado
             existing_user = User.objects.filter(email=email).first()
-            #validacion de usuarios para su registro
+
             if existing_user:
                 return Response({"message":"Username "+email+", is already taken"},400)
-            #asignacion de valores a cada campo
+
             user = User.objects.create( username = email,
                                         email = email,
                                         first_name = first_name,
                                         last_name = last_name,
                                         is_active = 1)
 
-            #Guardar los datos del administrador
+            #Esto se envia a la base de datos
             user.save()
-            user.set_password(password) #Encripta-cifra la contraseña
-            user.save()#Guarda la contraseña cifrada
-
+            user.set_password(password) #Encripta (cifrar) la contraseña
+            user.save() #Guarda la contraseña encriptada
+            #Tabla de grupos 
             group, created = Group.objects.get_or_create(name=role)
             group.user_set.add(user)
             user.save()
 
             #Create a profile for the user
-            #Anadir la informacion del administrador creado a el modelo de administradores
-            admin = Administradores.objects.create(user=user,#Aca se liga la FK entre los 2 modelos
+            admin = Administradores.objects.create(user=user,
                                             clave_admin= request.data["clave_admin"],
                                             telefono= request.data["telefono"],
                                             rfc= request.data["rfc"].upper(),
                                             edad= request.data["edad"],
                                             ocupacion= request.data["ocupacion"])
-            admin.save()#Guarda la informacion del administrador
+            admin.save() #Guarda los datos en la base de datos
 
-            return Response({"admin_created_id": admin.id }, 201)#Si todo sale bien manda un mensaje de 201 (todo correcto)
+            return Response({"admin_created_id": admin.id }, 201)
 
-        return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)#Si hay un error manda un mensaje de 400 (error)
+        return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AdminsViewEdit(generics.CreateAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    #Contar el total de cada tipo de usuarios
+    def get(self, request, *args, **kwargs):
+        #Obtener total de admins
+        admin = Administradores.objects.filter(user__is_active = 1).order_by("id")
+        lista_admins = AdminSerializer(admin, many=True).data
+        # Obtienes la cantidad de elementos en la lista
+        total_admins = len(lista_admins)
+
+        #Obtener total de maestros
+        maestros = Maestros.objects.filter(user__is_active = 1).order_by("id")
+        lista_maestros = MaestroSerializer(maestros, many=True).data
+        #Aquí convertimos los valores de nuevo a un array
+        if not lista_maestros:
+            return Response({},400)
+        for maestro in lista_maestros:
+            maestro["materias_json"] = json.loads(maestro["materias_json"])
+        
+        total_maestros = len(lista_maestros)
+
+        #Obtener total de alumnos
+        alumnos = Alumnos.objects.filter(user__is_active = 1).order_by("id")
+        lista_alumnos = AlumnoSerializer(alumnos, many=True).data
+        total_alumnos = len(lista_alumnos)
+
+        return Response({'admins': total_admins, 'maestros': total_maestros, 'alumnos:':total_alumnos }, 200)
+    
+    #Editar administrador
+    def put(self, request, *args, **kwargs):
+        # iduser=request.data["id"]
+        admin = get_object_or_404(Administradores, id=request.data["id"])
+        admin.clave_admin = request.data["clave_admin"]
+        admin.telefono = request.data["telefono"]
+        admin.rfc = request.data["rfc"]
+        admin.edad = request.data["edad"]
+        admin.ocupacion = request.data["ocupacion"]
+        admin.save()
+        temp = admin.user
+        temp.first_name = request.data["first_name"]
+        temp.last_name = request.data["last_name"]
+        temp.save()
+        user = AdminSerializer(admin, many=False).data
+
+        return Response(user,200)
+    
+    #Eliminar administrador
+    def delete(self, request, *args, **kwargs):
+        admin = get_object_or_404(Administradores, id=request.GET.get("id"))
+        try:
+            admin.user.delete()
+            return Response({"details":"Aministrador eliminado"},200)
+        except Exception as e:            
+            return Response({"details":"Algo paso mal al eliminar"},200)
