@@ -30,29 +30,33 @@ import string
 import random
 import json
 
-#Esta funcion permite obtener toda la vista de maestros, mediante el token de autenticacion de inicio de sesion
+#Permite obtener toda la lista de Maestros
 class MaestrosAll(generics.CreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     def get(self, request, *args, **kwargs):
         maestros = Maestros.objects.filter(user__is_active = 1).order_by("id")
-        lista = MaestroSerializer(maestros, many=True).data
-        
-        return Response(lista, 200)
+        maestros = MaestroSerializer(maestros, many=True).data
+        #Aquí convertimos los valores de nuevo a un array
+        if not maestros:
+            return Response({},400)
+        for maestro in maestros:
+            maestro["materias_json"] = json.loads(maestro["materias_json"])
 
-class MaestrosView(generics.CreateAPIView):#Vista que realiza el Post
+        return Response(maestros, 200)
+
+#Esta clase permite 
+class MaestrosView(generics.CreateAPIView):
     #Obtener usuario por ID
     # permission_classes = (permissions.IsAuthenticated,)
     def get(self, request, *args, **kwargs):
         maestro = get_object_or_404(Maestros, id = request.GET.get("id"))
         maestro = MaestroSerializer(maestro, many=False).data
         maestro["materias_json"] = json.loads(maestro["materias_json"])
-
         return Response(maestro, 200)
     
     #Registrar nuevo usuario
     @transaction.atomic
     def post(self, request, *args, **kwargs):
-
         user = UserSerializer(data=request.data)
         if user.is_valid():
             #Grab user data
@@ -63,36 +67,67 @@ class MaestrosView(generics.CreateAPIView):#Vista que realiza el Post
             password = request.data['password']
             #Valida si existe el usuario o bien el email registrado
             existing_user = User.objects.filter(email=email).first()
-            #validacion de usuarios para su registro
+
             if existing_user:
                 return Response({"message":"Username "+email+", is already taken"},400)
-            #asignacion de valores a cada campo
+
             user = User.objects.create( username = email,
                                         email = email,
                                         first_name = first_name,
                                         last_name = last_name,
                                         is_active = 1)
 
-            #Guardar los datos del alumno
-            user.set_password(password) #Encripta-cifra la contraseña
-            user.save()#Guarda la contraseña cifrada
-
+            #Esto se envia a la base de datos
+            user.save()
+            user.set_password(password) #Encripta (cifrar) la contraseña
+            user.save() #Guarda la contraseña encriptada
+            #Tabla de grupos 
             group, created = Group.objects.get_or_create(name=role)
             group.user_set.add(user)
             user.save()
 
-            #Create a profile for the maestros
-            #Anadir la informacion del maestro creado a el modelo de maestros
-            maestro = Maestros.objects.create(user=user,#Aca se liga la FK entre los 2 modelos
-                                            id_trabajador= request.data["id_trabajador"],
-                                            fecha_nacimiento= request.data["fecha_nacimiento"],
+            #Create a profile for the user (Maerstro)
+            maestro = Maestros.objects.create(user=user,
+                                            clave_maestro = request.data["clave_maestro"],
+                                            fecha_de_nacimiento= request.data["fecha_de_nacimiento"],
                                             telefono= request.data["telefono"],
                                             rfc= request.data["rfc"].upper(),
                                             cubiculo= request.data["cubiculo"],
-                                            area_investigacion= request.data["area_investigacion"],
-                                             materias_json = json.dumps(request.data["materias_json"]))#Se usa json.dumps para convertirlo a una cadena de texto JSON y asi poder tratarlo mas facil en la BD
-            maestro.save()#Guarda la informacion del maestro
+                                            area_investigacion = request.data["area_investigacion"],
+                                            materias_json = json.dumps(request.data["materias_json"]))
+            maestro.save() #Guarda los datos en la base de datos
 
-            return Response({"maestro_created_id": maestro.id }, 201)#Si todo sale bien manda un mensaje de 201 (todo correcto)
+            return Response({"maestro_created_id": maestro.id }, 201)
 
-        return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)#Si hay un error manda un mensaje de 400 (error)
+        return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#Se tiene que modificar la parte de edicion y eliminar
+class MaestrosViewEdit(generics.CreateAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    def put(self, request, *args, **kwargs):
+        # iduser=request.data["id"]
+        maestro = get_object_or_404(Maestros, id=request.data["id"])
+        maestro.clave_maestro = request.data["clave_maestro"]
+        maestro.fecha_de_nacimiento = request.data["fecha_de_nacimiento"]
+        maestro.telefono = request.data["telefono"]
+        maestro.rfc = request.data["rfc"]
+        maestro.cubiculo = request.data["cubiculo"]
+        maestro.area_investigacion = request.data["area_investigacion"]
+        maestro.materias_json = json.dumps(request.data["materias_json"])
+        maestro.save()
+        temp = maestro.user
+        temp.first_name = request.data["first_name"]
+        temp.last_name = request.data["last_name"]
+        temp.save()
+        user = MaestroSerializer(maestro, many=False).data
+
+        return Response(user,200)
+    
+    #Eliminar maestros
+    def delete(self, request, *args, **kwargs):
+        profile = get_object_or_404(Maestros, id=request.GET.get("id"))
+        try:
+            profile.user.delete()
+            return Response({"details":"Maestro eliminado"},200)
+        except Exception as e:            
+            return Response({"details":"Algo paso mal al eliminar"},200)
