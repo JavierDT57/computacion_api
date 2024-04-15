@@ -73,6 +73,7 @@ class AlumnosView(generics.CreateAPIView):#Vista que realiza el Post
                                         is_active = 1)
 
             #Guardar los datos del alumno
+            user.save()
             user.set_password(password) #Encripta-cifra la contraseña
             user.save()#Guarda la contraseña cifrada
 
@@ -95,3 +96,34 @@ class AlumnosView(generics.CreateAPIView):#Vista que realiza el Post
             return Response({"alumno_created_id": alumno.id }, 201)#Si todo sale bien manda un mensaje de 201 (todo correcto)
 
         return Response(user.errors, status=status.HTTP_400_BAD_REQUEST)#Si hay un error manda un mensaje de 400 (error)
+
+    #Se tiene que modificar la parte de edicion y eliminar
+class AlumnosViewEdit(generics.CreateAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    def put(self, request, *args, **kwargs):
+        # iduser=request.data["id"]
+        alumno = get_object_or_404(Alumnos, id=request.data["id"])
+        alumno.matricula = request.data["matricula"]
+        alumno.fecha_de_nacimiento = request.data["fecha_de_nacimiento"]
+        alumno.telefono = request.data["telefono"]
+        alumno.curp = request.data["curp"]
+        alumno.rfc = request.data["rfc"]
+        alumno.edad = request.data["edad"]
+        alumno.ocupacion = request.data["ocupacion"]
+        alumno.save()
+        temp = alumno.user
+        temp.first_name = request.data["first_name"]
+        temp.last_name = request.data["last_name"]
+        temp.save()
+        user = AlumnoSerializer(alumno, many=False).data
+
+        return Response(user,200)
+        
+        #Eliminar alumnos
+def delete(self, request, *args, **kwargs):
+    profile = get_object_or_404(Alumnos, id=request.GET.get("id"))
+    try:
+        profile.user.delete()
+        return Response({"details":"Alumno eliminado"},200)
+    except Exception as e:            
+        return Response({"details":"Algo paso mal al eliminar"},200)

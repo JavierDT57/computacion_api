@@ -107,8 +107,8 @@ class MaestrosViewEdit(generics.CreateAPIView):
     def put(self, request, *args, **kwargs):
         # iduser=request.data["id"]
         maestro = get_object_or_404(Maestros, id=request.data["id"])
-        maestro.clave_maestro = request.data["clave_maestro"]
-        maestro.fecha_de_nacimiento = request.data["fecha_de_nacimiento"]
+        maestro.id_trabajador = request.data["id_trabajador"]
+        maestro.fecha_nacimiento = request.data["fecha_nacimiento"]
         maestro.telefono = request.data["telefono"]
         maestro.rfc = request.data["rfc"]
         maestro.cubiculo = request.data["cubiculo"]
