@@ -146,6 +146,6 @@ class AdminsViewEdit(generics.CreateAPIView):
         admin = get_object_or_404(Administradores, id=request.GET.get("id"))
         try:
             admin.user.delete()
-            return Response({"details":"Aministrador eliminado"},200)
+            return Response({"details":"Administrador eliminado"},200)
         except Exception as e:            
-            return Response({"details":"Algo paso mal al eliminar"},200)
+            return Response({"details":"No se pudo eliminar el Administrador"},200)

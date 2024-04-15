@@ -119,11 +119,11 @@ class AlumnosViewEdit(generics.CreateAPIView):
 
         return Response(user,200)
         
-        #Eliminar alumnos
-def delete(self, request, *args, **kwargs):
-    profile = get_object_or_404(Alumnos, id=request.GET.get("id"))
-    try:
-        profile.user.delete()
-        return Response({"details":"Alumno eliminado"},200)
-    except Exception as e:            
-        return Response({"details":"Algo paso mal al eliminar"},200)
+    #Eliminar alumnos
+    def delete(self, request, *args, **kwargs):
+        profile = get_object_or_404(Alumnos, id=request.GET.get("id"))
+        try:
+            profile.user.delete()
+            return Response({"details":"Alumno eliminado"},200)
+        except Exception as e:            
+            return Response({"details":"No se pudo eliminar el Alumno"},200)

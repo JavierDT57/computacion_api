@@ -130,4 +130,4 @@ class MaestrosViewEdit(generics.CreateAPIView):
             profile.user.delete()
             return Response({"details":"Maestro eliminado"},200)
         except Exception as e:            
-            return Response({"details":"Algo paso mal al eliminar"},200)
+            return Response({"details":"No se pudo eliminar el Maestro"},200)
