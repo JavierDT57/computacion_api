@@ -44,7 +44,7 @@ class AlumnosView(generics.CreateAPIView):#Vista que realiza el Post
     # permission_classes = (permissions.IsAuthenticated,)
     def get(self, request, *args, **kwargs):
         alumno = get_object_or_404(Alumnos, id = request.GET.get("id"))
-        alumno = AdminSerializer(Alumnos, many=False).data
+        alumno = AlumnoSerializer(alumno, many=False).data
 
         return Response(alumno, 200)
     
