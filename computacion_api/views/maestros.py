@@ -45,6 +45,7 @@ class MaestrosView(generics.CreateAPIView):#Vista que realiza el Post
     def get(self, request, *args, **kwargs):
         maestro = get_object_or_404(Maestros, id = request.GET.get("id"))
         maestro = MaestroSerializer(maestro, many=False).data
+        maestro["materias_json"] = json.loads(maestro["materias_json"])
 
         return Response(maestro, 200)
     
