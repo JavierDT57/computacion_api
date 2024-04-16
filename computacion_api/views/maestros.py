@@ -88,8 +88,8 @@ class MaestrosView(generics.CreateAPIView):
 
             #Create a profile for the user (Maerstro)
             maestro = Maestros.objects.create(user=user,
-                                            clave_maestro = request.data["clave_maestro"],
-                                            fecha_de_nacimiento= request.data["fecha_de_nacimiento"],
+                                            id_trabajador = request.data["id_trabajador"],
+                                            fecha_nacimiento= request.data["fecha_de_nacimiento"],
                                             telefono= request.data["telefono"],
                                             rfc= request.data["rfc"].upper(),
                                             cubiculo= request.data["cubiculo"],
@@ -130,4 +130,4 @@ class MaestrosViewEdit(generics.CreateAPIView):
             profile.user.delete()
             return Response({"details":"Maestro eliminado"},200)
         except Exception as e:            
-            return Response({"details":"No se pudo eliminar el Maestro"},200)
+            return Response({"details":"No se pudo eliminar el"},200)
