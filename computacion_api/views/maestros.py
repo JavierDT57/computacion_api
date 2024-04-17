@@ -89,7 +89,7 @@ class MaestrosView(generics.CreateAPIView):
             #Create a profile for the user (Maerstro)
             maestro = Maestros.objects.create(user=user,
                                             id_trabajador = request.data["id_trabajador"],
-                                            fecha_nacimiento= request.data["fecha_de_nacimiento"],
+                                            fecha_nacimiento= request.data["fecha_nacimiento"],
                                             telefono= request.data["telefono"],
                                             rfc= request.data["rfc"].upper(),
                                             cubiculo= request.data["cubiculo"],
