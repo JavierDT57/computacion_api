@@ -34,3 +34,10 @@ class MaestroSerializer(serializers.ModelSerializer):
     class Meta:
         model = Maestros
         fields = '__all__'
+        
+#Serializador para materias
+class MateriaSerializer(serializers.ModelSerializer): 
+    user=UserSerializer(read_only=True)
+    class Meta:
+        model = Materias
+        fields = '__all__'

@@ -56,3 +56,20 @@ class Maestros(models.Model):
 
     def __str__(self):
         return "Perfil del maestro "+self.first_name+" "+self.last_name  
+    
+    
+class Materias(models.Model):
+    id = models.BigAutoField(primary_key=True)   
+    nrc_materia = models.IntegerField(null=True, blank=True)#nrc
+    nombre_materia = models.CharField(max_length=255,null=True, blank=True)#nombre de la materia
+    hora_inicial = models.TimeField(auto_now_add=False, null=True, blank=True)#horario inicial
+    hora_final = models.TimeField(auto_now_add=False, null=True, blank=True)#horario final
+    seccion_materia = models.IntegerField(null=True, blank=True)#seccion de la materia
+    salon_materia = models.CharField(max_length=255,null=True, blank=True)#salon de la materia
+    programa_materia = models.CharField(max_length=255,null=True, blank=True)#programa educativo de la materia
+    dias_json = models.TextField(null=True, blank=True)#dias para seleccionar y estan en un arreglo json, por asi el inicio de la variable
+    creation = models.DateTimeField(auto_now_add=True, null=True, blank=True)#fecha de creacion del registro
+    update = models.DateTimeField(null=True, blank=True)#fecha de actualizacion del registro
+
+    def __str__(self):
+        return f"Materia: {self.nombre_materia} - Sección: {self.seccion_materia}"
