@@ -19,6 +19,7 @@ from computacion_api.views import bootstrap
 from computacion_api.views import users#Vista de administradores
 from computacion_api.views import alumnos#Visa de alumnos
 from computacion_api.views import maestros#Vista de maestros
+from computacion_api.views import materias#Vista de maestros
 from computacion_api.views import auth
 
 urlpatterns = [
@@ -42,6 +43,8 @@ urlpatterns = [
        path('lista-maestros/', maestros.MaestrosAll.as_view()),
     #Edit Maestro
         path('maestros-edit/', maestros.MaestrosViewEdit.as_view()), 
+    #Create Materia
+        path('materias/', materias.MateriasView.as_view()),
     #Login
         path('token/', auth.CustomAuthToken.as_view()),
     #Logout
