@@ -74,6 +74,7 @@ class MateriasView(generics.CreateAPIView):
             
     @transaction.atomic
     def post(self, request, *args, **kwargs):
+        #Funcion para obtener los NRC de la BD y detectar que no se registren NRC repetidos
         nrc_materia = request.data.get('nrc_materia')  # Obtenemos el NRC de la solicitud
     
         # Validamos si el NRC proporcionado ya existe en la base de datos
@@ -81,7 +82,7 @@ class MateriasView(generics.CreateAPIView):
         if existing_materia:
             return Response({"message": f"Materia con NRC {nrc_materia} ya existe"}, status=status.HTTP_400_BAD_REQUEST)
         
-
+        #Creacion de funcion para poder registrar las materias en el modelo de materias en la BD
         #Create a profile for the user (Materia)
         materia = Materias.objects.create(
                                         nrc_materia = request.data["nrc_materia"],
