@@ -34,7 +34,7 @@ import json
 class MateriasAll(generics.CreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     def get(self, request, *args, **kwargs):
-        materias = Materias.objects.filter(user__is_active = 1).order_by("id")
+        materias = Materias.objects.filter().order_by("id")#Aca solo filtro por ID para su ordenamiento
         materias = MateriaSerializer(materias, many=True).data
         #Aquí convertimos los valores de nuevo a un array
         if not materias:
@@ -98,33 +98,32 @@ class MateriasView(generics.CreateAPIView):
         return Response({"materia_created_id": materia.id }, 201)
 
 
-#Se tiene que modificar la parte de edicion y eliminar
-class MaestrosViewEdit(generics.CreateAPIView):
+#Funciones para editar y eliminar materias
+class MateriasViewEdit(generics.CreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     def put(self, request, *args, **kwargs):
         # iduser=request.data["id"]
-        maestro = get_object_or_404(Maestros, id=request.data["id"])
-        maestro.id_trabajador = request.data["id_trabajador"]
-        maestro.fecha_nacimiento = request.data["fecha_nacimiento"]
-        maestro.telefono = request.data["telefono"]
-        maestro.rfc = request.data["rfc"]
-        maestro.cubiculo = request.data["cubiculo"]
-        maestro.area_investigacion = request.data["area_investigacion"]
-        maestro.materias_json = json.dumps(request.data["materias_json"])
-        maestro.save()
-        temp = maestro.user
-        temp.first_name = request.data["first_name"]
-        temp.last_name = request.data["last_name"]
+        materia = get_object_or_404(Materias, id=request.data["id"])
+        materia.nrc_materia = request.data["nrc_materia"]
+        materia.nombre_materia = request.data["nombre_materia"]
+        materia.hora_inicial = request.data["hora_inicial"]
+        materia.hora_final = request.data["hora_final"]
+        materia.seccion_materia = request.data["seccion_materia"]
+        materia.salon_materia = request.data["salon_materia"]
+        materia.programa_materia = request.data["programa_materia"]
+        materia.dias_json = json.dumps(request.data["dias_json"])
+        materia.save()
+        temp = materia.nrc_materia
         temp.save()
-        user = MaestroSerializer(maestro, many=False).data
+        user = MateriaSerializer(materia, many=False).data
 
         return Response(user,200)
     
     #Eliminar maestros
     def delete(self, request, *args, **kwargs):
-        profile = get_object_or_404(Maestros, id=request.GET.get("id"))
+        profile = get_object_or_404(Materias, id=request.GET.get("id"))
         try:
             profile.user.delete()
-            return Response({"details":"Maestro eliminado"},200)
+            return Response({"details":"Materia eliminada"},200)
         except Exception as e:            
-            return Response({"details":"No se pudo eliminar el"},200)
+            return Response({"details":"No se pudo eliminar la materia"},200)
