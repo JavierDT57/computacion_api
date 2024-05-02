@@ -47,6 +47,8 @@ urlpatterns = [
         path('materias/', materias.MateriasView.as_view()),
     #Lista de Materias
        path('lista-materias/', materias.MateriasAll.as_view()),
+    #Edit Materias
+        path('materias-edit/', materias.MateriasViewEdit.as_view()), 
     #Login
         path('token/', auth.CustomAuthToken.as_view()),
     #Logout
