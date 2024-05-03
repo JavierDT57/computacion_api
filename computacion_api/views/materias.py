@@ -83,7 +83,7 @@ class MateriasView(generics.CreateAPIView):
             return Response({"message": f"Materia con NRC {nrc_materia} ya existe"}, status=status.HTTP_400_BAD_REQUEST)
         
         #Creacion de funcion para poder registrar las materias en el modelo de materias en la BD
-        #Create a profile for the user (Materia)
+        #Create a profile for Materias
         materia = Materias.objects.create(
                                         nrc_materia = request.data["nrc_materia"],
                                         nombre_materia= request.data["nombre_materia"],
@@ -99,6 +99,8 @@ class MateriasView(generics.CreateAPIView):
 
 
 #Funciones para editar y eliminar materias
+
+#Editar materia
 class MateriasViewEdit(generics.CreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     def put(self, request, *args, **kwargs):
