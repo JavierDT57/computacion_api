@@ -113,17 +113,15 @@ class MateriasViewEdit(generics.CreateAPIView):
         materia.programa_materia = request.data["programa_materia"]
         materia.dias_json = json.dumps(request.data["dias_json"])
         materia.save()
-        temp = materia.nrc_materia
-        temp.save()
         user = MateriaSerializer(materia, many=False).data
 
         return Response(user,200)
     
-    #Eliminar maestros
+    #Eliminar materia
     def delete(self, request, *args, **kwargs):
         profile = get_object_or_404(Materias, id=request.GET.get("id"))
         try:
-            profile.user.delete()
+            profile.delete()
             return Response({"details":"Materia eliminada"},200)
         except Exception as e:            
             return Response({"details":"No se pudo eliminar la materia"},200)
